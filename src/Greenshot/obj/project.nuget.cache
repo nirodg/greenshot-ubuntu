@@ -1,0 +1,76 @@
+{
+  "version": 2,
+  "dgSpecHash": "DpH41rdMiT3ZWUgTqNo8whjwmWpcGh+B0uC+oJjg0SJHxTYSUg0qsk0ctkWXVR3kJtZmAIP4sVWSHDEiBt/ePA==",
+  "success": true,
+  "projectFilePath": "/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot/Greenshot.csproj",
+  "expectedPackageFiles": [
+    "/home/dorin/.nuget/packages/avalonia/11.2.1/avalonia.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.angle.windows.natives/2.1.22045.20230930/avalonia.angle.windows.natives.2.1.22045.20230930.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.buildservices/0.0.29/avalonia.buildservices.0.0.29.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.desktop/11.2.1/avalonia.desktop.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.fonts.inter/11.2.1/avalonia.fonts.inter.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.freedesktop/11.2.1/avalonia.freedesktop.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.native/11.2.1/avalonia.native.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.remote.protocol/11.2.1/avalonia.remote.protocol.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.skia/11.2.1/avalonia.skia.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.themes.fluent/11.2.1/avalonia.themes.fluent.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.win32/11.2.1/avalonia.win32.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/avalonia.x11/11.2.1/avalonia.x11.11.2.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/harfbuzzsharp/7.3.0.2/harfbuzzsharp.7.3.0.2.nupkg.sha512",
+    "/home/dorin/.nuget/packages/harfbuzzsharp.nativeassets.linux/7.3.0.2/harfbuzzsharp.nativeassets.linux.7.3.0.2.nupkg.sha512",
+    "/home/dorin/.nuget/packages/harfbuzzsharp.nativeassets.macos/7.3.0.2/harfbuzzsharp.nativeassets.macos.7.3.0.2.nupkg.sha512",
+    "/home/dorin/.nuget/packages/harfbuzzsharp.nativeassets.webassembly/7.3.0.3-preview.2.2/harfbuzzsharp.nativeassets.webassembly.7.3.0.3-preview.2.2.nupkg.sha512",
+    "/home/dorin/.nuget/packages/harfbuzzsharp.nativeassets.win32/7.3.0.2/harfbuzzsharp.nativeassets.win32.7.3.0.2.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microcom.runtime/0.11.0/microcom.runtime.0.11.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.configuration/8.0.0/microsoft.extensions.configuration.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.configuration.binder/8.0.0/microsoft.extensions.configuration.binder.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.dependencyinjection/8.0.0/microsoft.extensions.dependencyinjection.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.1/microsoft.extensions.dependencyinjection.abstractions.8.0.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.logging/8.0.0/microsoft.extensions.logging.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.1/microsoft.extensions.logging.abstractions.8.0.1.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.logging.configuration/8.0.0/microsoft.extensions.logging.configuration.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.logging.console/8.0.0/microsoft.extensions.logging.console.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.options/8.0.0/microsoft.extensions.options.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.options.configurationextensions/8.0.0/microsoft.extensions.options.configurationextensions.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/sixlabors.imagesharp/3.1.5/sixlabors.imagesharp.3.1.5.nupkg.sha512",
+    "/home/dorin/.nuget/packages/skiasharp/2.88.8/skiasharp.2.88.8.nupkg.sha512",
+    "/home/dorin/.nuget/packages/skiasharp.nativeassets.linux/2.88.8/skiasharp.nativeassets.linux.2.88.8.nupkg.sha512",
+    "/home/dorin/.nuget/packages/skiasharp.nativeassets.macos/2.88.8/skiasharp.nativeassets.macos.2.88.8.nupkg.sha512",
+    "/home/dorin/.nuget/packages/skiasharp.nativeassets.webassembly/2.88.8/skiasharp.nativeassets.webassembly.2.88.8.nupkg.sha512",
+    "/home/dorin/.nuget/packages/skiasharp.nativeassets.win32/2.88.8/skiasharp.nativeassets.win32.2.88.8.nupkg.sha512",
+    "/home/dorin/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/system.text.encodings.web/8.0.0/system.text.encodings.web.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/system.text.json/8.0.0/system.text.json.8.0.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/tmds.dbus.protocol/0.20.0/tmds.dbus.protocol.0.20.0.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/8.0.26/microsoft.netcore.app.runtime.linux-x64.8.0.26.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/8.0.26/microsoft.aspnetcore.app.runtime.linux-x64.8.0.26.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.netcore.app.crossgen2.linux-x64/8.0.26/microsoft.netcore.app.crossgen2.linux-x64.8.0.26.nupkg.sha512",
+    "/home/dorin/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.26/microsoft.netcore.app.host.linux-x64.8.0.26.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'SixLabors.ImageSharp' 3.1.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-2cmq-823j-5qj8",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0",
+        "net8.0/linux-x64"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'SixLabors.ImageSharp' 3.1.5 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-rxmq-m78w-7wmc",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0",
+        "net8.0/linux-x64"
+      ]
+    }
+  ]
+}

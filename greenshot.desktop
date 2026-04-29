@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Greenshot
+Comment=Screenshot tool for Linux
+Exec=greenshot
+Icon=greenshot
+Type=Application
+Categories=Graphics;Photography;Utility;
+Keywords=screenshot;capture;screen;annotation;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

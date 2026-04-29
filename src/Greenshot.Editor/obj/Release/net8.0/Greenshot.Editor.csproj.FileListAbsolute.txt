@@ -1,0 +1,17 @@
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/bin/Release/net8.0/Greenshot.Editor.deps.json
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/bin/Release/net8.0/Greenshot.Editor.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/bin/Release/net8.0/Greenshot.Editor.pdb
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/bin/Release/net8.0/Greenshot.Base.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/bin/Release/net8.0/Greenshot.Base.pdb
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Greenshot.Editor.csproj.AssemblyReference.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Avalonia/Resources.Inputs.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Avalonia/resources
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Greenshot.Editor.GeneratedMSBuildEditorConfig.editorconfig
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Greenshot.Editor.AssemblyInfoInputs.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Greenshot.Editor.AssemblyInfo.cs
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Greenshot.Editor.csproj.CoreCompileInputs.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Avalonia/Greenshot.Editor.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Avalonia/Greenshot.Editor.pdb
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/refint/Avalonia/Greenshot.Editor.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/Greenshot.Editor.csproj.CopyComplete
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Editor/obj/Release/net8.0/ref/Greenshot.Editor.dll

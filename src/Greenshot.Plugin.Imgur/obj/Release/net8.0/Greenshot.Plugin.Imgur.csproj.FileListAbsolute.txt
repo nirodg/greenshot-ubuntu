@@ -1,0 +1,15 @@
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/bin/Release/net8.0/Greenshot.Plugin.Imgur.deps.json
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/bin/Release/net8.0/Greenshot.Plugin.Imgur.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/bin/Release/net8.0/Greenshot.Plugin.Imgur.pdb
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/bin/Release/net8.0/Greenshot.Base.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/bin/Release/net8.0/Greenshot.Base.pdb
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.csproj.AssemblyReference.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.GeneratedMSBuildEditorConfig.editorconfig
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.AssemblyInfoInputs.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.AssemblyInfo.cs
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.csproj.CoreCompileInputs.cache
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.csproj.CopyComplete
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/refint/Greenshot.Plugin.Imgur.dll
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/Greenshot.Plugin.Imgur.pdb
+/home/dorin/work/eorghe.com/greenshot-ubuntu/ported/src/Greenshot.Plugin.Imgur/obj/Release/net8.0/ref/Greenshot.Plugin.Imgur.dll

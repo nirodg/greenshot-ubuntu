@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Greenshot.Views.SettingsWindow"
+        Title="Greenshot Settings"
+        Width="560" Height="480"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                HorizontalAlignment="Right" Margin="0,8,0,0" Spacing="8">
+      <Button Content="Save" Width="80" Click="OnSave"/>
+      <Button Content="Cancel" Width="80" Click="OnCancel"/>
+    </StackPanel>
+
+    <TabControl>
+      <!-- General -->
+      <TabItem Header="General">
+        <StackPanel Margin="8" Spacing="8">
+          <TextBlock Text="Capture Settings" FontWeight="Bold"/>
+          <CheckBox x:Name="ChkMousePointer" Content="Capture mouse pointer"/>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Capture delay (ms):" VerticalAlignment="Center"/>
+            <NumericUpDown x:Name="NudDelay" Minimum="0" Maximum="5000" Width="100"/>
+          </StackPanel>
+          <Separator/>
+          <TextBlock Text="After Capture" FontWeight="Bold"/>
+          <CheckBox x:Name="ChkShowNotification" Content="Show notification after capture"/>
+          <CheckBox x:Name="ChkPlaySound" Content="Play camera sound"/>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Output -->
+      <TabItem Header="Output">
+        <StackPanel Margin="8" Spacing="8">
+          <TextBlock Text="File Output" FontWeight="Bold"/>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Save to:" VerticalAlignment="Center" Width="80"/>
+            <TextBox x:Name="TxtOutputPath" Width="300"/>
+            <Button Content="Browse..." Click="OnBrowseOutput"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Filename:" VerticalAlignment="Center" Width="80"/>
+            <TextBox x:Name="TxtFilenamePattern" Width="300"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Format:" VerticalAlignment="Center" Width="80"/>
+            <ComboBox x:Name="CmbFormat" Width="120">
+              <ComboBoxItem Content="PNG" Tag="Png"/>
+              <ComboBoxItem Content="JPEG" Tag="Jpg"/>
+              <ComboBoxItem Content="BMP" Tag="Bmp"/>
+              <ComboBoxItem Content="TIFF" Tag="Tiff"/>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8" x:Name="JpegPanel">
+            <TextBlock Text="JPEG Quality:" VerticalAlignment="Center" Width="80"/>
+            <Slider x:Name="SldJpegQuality" Minimum="1" Maximum="100" Width="200"/>
+            <TextBlock x:Name="TxtJpegQuality" Text="80" VerticalAlignment="Center"/>
+          </StackPanel>
+          <CheckBox x:Name="ChkCopyPathToClipboard" Content="Copy path to clipboard after save"/>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Hotkeys -->
+      <TabItem Header="Hotkeys">
+        <Grid Margin="8" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
+          <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Global Hotkeys" FontWeight="Bold" Margin="0,0,0,8"/>
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Region capture:" VerticalAlignment="Center"/>
+          <TextBox Grid.Row="1" Grid.Column="1" x:Name="TxtRegionHotkey" Margin="0,2"/>
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Full screen:" VerticalAlignment="Center"/>
+          <TextBox Grid.Row="2" Grid.Column="1" x:Name="TxtFullscreenHotkey" Margin="0,2"/>
+          <TextBlock Grid.Row="3" Grid.Column="0" Text="Window:" VerticalAlignment="Center"/>
+          <TextBox Grid.Row="3" Grid.Column="1" x:Name="TxtWindowHotkey" Margin="0,2"/>
+          <TextBlock Grid.Row="4" Grid.Column="0" Text="Last region:" VerticalAlignment="Center"/>
+          <TextBox Grid.Row="4" Grid.Column="1" x:Name="TxtLastRegionHotkey" Margin="0,2"/>
+          <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Text="Format: [Ctrl+][Alt+][Shift+]Key  (e.g. Print, Ctrl+Print, F1)"
+                     FontStyle="Italic" FontSize="11" Margin="0,8,0,0"/>
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>
