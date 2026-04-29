@@ -15,8 +15,13 @@ dotnet publish "$SRC/Greenshot/Greenshot.csproj" \
     -p:PublishSingleFile=false \
     -p:PublishReadyToRun=true
 
+# Pack a distributable zip
+VERSION=$(date +%Y%m%d)
+ZIP="$SCRIPT_DIR/greenshot-linux-x64-$VERSION.zip"
+(cd "$OUT" && zip -r "$ZIP" .)
 echo ""
 echo "Build complete! Output: $OUT"
+echo "Distributable:  $ZIP"
 echo ""
 echo "To install system-wide:"
 echo "  sudo cp $OUT/Greenshot /usr/local/bin/greenshot"
