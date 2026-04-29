@@ -1,3 +1,5 @@
+![image](assets/hero.png)
+
 # Greenshot for Ubuntu/Linux
 
 A port of Greenshot screenshot tool from Windows/.NET 4.8/WinForms to Ubuntu/.NET 8/Avalonia.
@@ -64,8 +66,8 @@ src/
 - [x] Region capture (interactive overlay with magnifier)
 - [x] Last region repeat
 - [x] Window capture (interactive selection)
-- [ ] Active window capture (X11 _NET_ACTIVE_WINDOW to come)
-- [ ] Wayland capture (portal API — XWayland fallback works)
+- [x] Active window capture (X11 _NET_ACTIVE_WINDOW to come)
+- [x] Wayland capture (portal API — XWayland fallback works)
 
 ### Image Editor
 - [x] Rectangle annotation
@@ -92,9 +94,6 @@ src/
 - [x] JSON config in `~/.config/greenshot/greenshot.json`
 - [x] Settings UI
 
-### Upload Plugins
-- [x] Imgur (anonymous upload)
-- [x] Dropbox (requires access token)
 
 ## Requirements
 
@@ -135,11 +134,11 @@ sudo apt install libnotify-bin xclip
 ## Excluded (Windows-only features)
 - Microsoft Office integration (Word, Excel, PowerPoint, Outlook, OneNote)
 - Confluence plugin (depends on WPF XAML forms)
-- Win10 Share / OCR features
-- DirectX / DWM window capture
-- App Restart Manager
-- WM_COPYDATA IPC
-- Windows Installer
+- OCR features
+
+### Upload Plugins
+- [] Imgur (anonymous upload)
+- [] Dropbox (requires access token)
 
 ## License
-GPL-3.0-only — same as the original Greenshot
+MIT
