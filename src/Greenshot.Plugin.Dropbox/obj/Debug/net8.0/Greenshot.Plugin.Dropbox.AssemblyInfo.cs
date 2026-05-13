@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © Greenshot 2004-2026")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ff84059a6ea153036e564c3dd8494012b43b46ae")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e9fc81b25be3b0a5f1e937d5c898a21e856112ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("Greenshot.Plugin.Dropbox")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Greenshot.Plugin.Dropbox")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<language ietf="en-US" name="English (United States)" version="1.0">
+  <resource name="application_title" value="Greenshot"/>
+  <resource name="capture_region" value="Capture Region"/>
+  <resource name="capture_fullscreen" value="Capture Full Screen"/>
+  <resource name="capture_window" value="Capture Window"/>
+  <resource name="capture_lastregion" value="Capture Last Region"/>
+  <resource name="settings" value="Settings"/>
+  <resource name="quit" value="Quit Greenshot"/>
+  <resource name="editor_save" value="Save"/>
+  <resource name="editor_save_as" value="Save As..."/>
+  <resource name="editor_close" value="Close"/>
+  <resource name="editor_undo" value="Undo"/>
+  <resource name="editor_redo" value="Redo"/>
+  <resource name="editor_copy_clipboard" value="Copy to Clipboard"/>
+  <resource name="editor_select_all" value="Select All"/>
+  <resource name="editor_delete" value="Delete Selected"/>
+  <resource name="editor_tool_select" value="Select"/>
+  <resource name="editor_tool_rect" value="Rectangle"/>
+  <resource name="editor_tool_ellipse" value="Ellipse"/>
+  <resource name="editor_tool_arrow" value="Arrow"/>
+  <resource name="editor_tool_text" value="Text"/>
+  <resource name="editor_tool_freehand" value="Freehand"/>
+  <resource name="editor_tool_highlight" value="Highlight"/>
+  <resource name="editor_tool_obfuscate" value="Obfuscate"/>
+  <resource name="settings_capture_mousepointer" value="Capture mouse pointer"/>
+  <resource name="settings_capture_delay" value="Capture delay (ms)"/>
+  <resource name="settings_output_path" value="Save to"/>
+  <resource name="settings_output_format" value="Format"/>
+  <resource name="notification_saved" value="Screenshot saved"/>
+</language>

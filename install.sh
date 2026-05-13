@@ -1,355 +1,267 @@
 #!/usr/bin/env bash
-# install.sh — Detect Ubuntu version, install .NET 8 SDK, build and install Greenshot
+# install.sh - Build and install Greenshot Linux port
 set -euo pipefail
 
-# ── Colour helpers ──────────────────────────────────────────────────────────
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
 info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
 success() { echo -e "${GREEN}[OK]${NC}    $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 die()     { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 
-# ── Require root (or sudo available) ───────────────────────────────────────
 SUDO=""
-if [[ $EUID -ne 0 ]]; then
-    command -v sudo &>/dev/null || die "This script needs root or sudo."
+if [[ ${EUID} -ne 0 ]]; then
+    command -v sudo >/dev/null 2>&1 || die "This installer needs root privileges (sudo not found)."
     SUDO="sudo"
-    info "Running as non-root; will use sudo for system operations."
 fi
 
-# ── Detect Ubuntu version ──────────────────────────────────────────────────
-[[ -f /etc/os-release ]] || die "/etc/os-release not found — is this Ubuntu?"
-# shellcheck source=/dev/null
-source /etc/os-release
-
-[[ "${ID:-}" == "ubuntu" ]] || die "This script targets Ubuntu. Detected: ${ID:-unknown}"
-
-VERSION_ID="${VERSION_ID:-}"   # e.g. "22.04"
-CODENAME="${UBUNTU_CODENAME:-${VERSION_CODENAME:-}}"  # e.g. "jammy"
-
-# Extract major version number (20, 22, 24 …)
-MAJOR_VER="${VERSION_ID%%.*}"
-[[ -n "$MAJOR_VER" ]] || die "Could not parse Ubuntu major version from VERSION_ID='$VERSION_ID'."
-
-info "Detected Ubuntu ${VERSION_ID} (${CODENAME}), major=${MAJOR_VER}"
-
-# ── Architecture mapping ───────────────────────────────────────────────────
-ARCH="$(uname -m)"
-case "$ARCH" in
-    x86_64)  DOTNET_ARCH="x64"  ; APT_ARCH="amd64" ;;
-    aarch64) DOTNET_ARCH="arm64"; APT_ARCH="arm64"  ;;
-    armv7l)  DOTNET_ARCH="arm"  ; APT_ARCH="armhf"  ;;
-    *)       die "Unsupported architecture: $ARCH" ;;
-esac
-info "Architecture: ${ARCH} → dotnet=${DOTNET_ARCH}, apt=${APT_ARCH}"
-
-# ── Paths ──────────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="${SCRIPT_DIR}/src"
-BUILD_DIR="${SCRIPT_DIR}/.build_output"
-INSTALL_BIN="/usr/local/bin/greenshot"
+OUT_DIR="${SCRIPT_DIR}/.build_output"
+
+INSTALL_PREFIX="/usr/local"
+INSTALL_BIN="${INSTALL_PREFIX}/bin/greenshot"
 INSTALL_DESKTOP="/usr/share/applications/greenshot.desktop"
-INSTALL_ICON_DIR="/usr/share/icons/hicolor/128x128/apps"
-DOTNET_SDK_VERSION="8.0"
+INSTALL_ICON="/usr/share/pixmaps/greenshot.ico"
 
-# ── Step 1: Install .NET 8 SDK ─────────────────────────────────────────────
-install_dotnet_via_ubuntu_packages() {
-    # Ubuntu 24.04 (Noble) ships dotnet-sdk-8.0 in the universe repo directly.
-    info "Installing .NET SDK ${DOTNET_SDK_VERSION} from Ubuntu packages..."
-    $SUDO apt-get update -qq
-    $SUDO apt-get install -y dotnet-sdk-${DOTNET_SDK_VERSION}
+SKIP_DOTNET=0
+SKIP_DEPS=0
+SKIP_BUILD=0
+NO_AUTOSTART=0
+
+usage() {
+    cat <<'EOF'
+Usage: ./install.sh [options]
+
+Options:
+  --skip-dotnet      Skip .NET SDK installation/check
+  --skip-deps        Skip runtime dependency installation
+  --skip-build       Skip build step and use existing .build_output/Greenshot
+  --no-autostart     Do not create ~/.config/autostart/greenshot.desktop
+  --prefix <path>    Install binary under prefix (default: /usr/local)
+  -h, --help         Show help
+EOF
 }
 
-install_dotnet_via_microsoft_repo() {
-    local feed_url="https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb"
-    local tmp_deb="/tmp/packages-microsoft-prod.deb"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --skip-dotnet)
+            SKIP_DOTNET=1
+            shift
+            ;;
+        --skip-deps)
+            SKIP_DEPS=1
+            shift
+            ;;
+        --skip-build)
+            SKIP_BUILD=1
+            shift
+            ;;
+        --no-autostart)
+            NO_AUTOSTART=1
+            shift
+            ;;
+        --prefix)
+            [[ $# -ge 2 ]] || die "--prefix requires a value"
+            INSTALL_PREFIX="$2"
+            INSTALL_BIN="${INSTALL_PREFIX}/bin/greenshot"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            die "Unknown option: $1"
+            ;;
+    esac
+done
 
-    info "Installing .NET SDK ${DOTNET_SDK_VERSION} via Microsoft package feed (${feed_url})..."
+TARGET_USER="${SUDO_USER:-$(id -un)}"
+TARGET_HOME="$(getent passwd "${TARGET_USER}" | cut -d: -f6)"
+[[ -n "${TARGET_HOME}" ]] || die "Could not determine home directory for user ${TARGET_USER}."
 
-    # Download the Microsoft repo config package
-    if command -v curl &>/dev/null; then
-        curl -sSL "$feed_url" -o "$tmp_deb"
-    elif command -v wget &>/dev/null; then
-        wget -q "$feed_url" -O "$tmp_deb"
+run_as_target_user() {
+    if [[ ${EUID} -eq 0 && -n "${SUDO_USER:-}" ]]; then
+        sudo -u "${TARGET_USER}" "$@"
     else
-        die "Neither curl nor wget is available. Install one and retry."
+        "$@"
     fi
-
-    $SUDO dpkg -i "$tmp_deb"
-    rm -f "$tmp_deb"
-
-    $SUDO apt-get update -qq
-    $SUDO apt-get install -y dotnet-sdk-${DOTNET_SDK_VERSION}
 }
 
-install_dotnet_via_snap() {
-    info "Installing .NET SDK ${DOTNET_SDK_VERSION} via snap..."
-    $SUDO snap install dotnet-sdk --classic --channel=8.0/stable
-    $SUDO snap alias dotnet-sdk.dotnet dotnet
-}
-
-install_dotnet_via_binaries() {
-    # Last-resort: download the official .NET install script from Microsoft
-    info "Falling back to Microsoft's dotnet-install.sh script..."
-    local tmp_script="/tmp/dotnet-install.sh"
-
-    if command -v curl &>/dev/null; then
-        curl -sSL "https://dot.net/v1/dotnet-install.sh" -o "$tmp_script"
-    elif command -v wget &>/dev/null; then
-        wget -q "https://dot.net/v1/dotnet-install.sh" -O "$tmp_script"
-    else
-        die "Cannot download dotnet-install.sh: no curl or wget."
-    fi
-
-    chmod +x "$tmp_script"
-
-    # Install into /usr/local/dotnet so it's system-wide
-    local dotnet_root="/usr/local/dotnet"
-    $SUDO bash "$tmp_script" \
-        --channel "${DOTNET_SDK_VERSION}" \
-        --install-dir "$dotnet_root" \
-        --no-path
-    rm -f "$tmp_script"
-
-    # Symlink so 'dotnet' is on PATH for all users
-    $SUDO ln -sf "${dotnet_root}/dotnet" /usr/local/bin/dotnet
-    info "dotnet installed at ${dotnet_root}, symlinked to /usr/local/bin/dotnet"
+check_ubuntu() {
+    [[ -f /etc/os-release ]] || die "Cannot detect OS (missing /etc/os-release)."
+    # shellcheck source=/dev/null
+    source /etc/os-release
+    [[ "${ID:-}" == "ubuntu" ]] || die "This installer currently supports Ubuntu only."
+    info "Detected Ubuntu ${VERSION_ID:-unknown}."
 }
 
 ensure_dotnet() {
-    # Already installed and correct major version?
-    if command -v dotnet &>/dev/null; then
-        local installed_ver
-        installed_ver="$(dotnet --version 2>/dev/null | cut -d. -f1)"
-        if [[ "$installed_ver" == "8" ]]; then
-            success "dotnet $(dotnet --version) already installed — skipping SDK installation."
-            return 0
+    if command -v dotnet >/dev/null 2>&1; then
+        local major
+        major="$(dotnet --version | cut -d. -f1)"
+        if [[ "${major}" == "8" ]]; then
+            success "dotnet $(dotnet --version) already installed."
+            return
         fi
-        warn "Found dotnet ${installed_ver}.x — need 8.x; will install SDK ${DOTNET_SDK_VERSION} alongside."
+        warn "Detected dotnet ${major}.x, installing dotnet 8 SDK as required."
     fi
 
-    # Strategy selection by Ubuntu version:
-    #   24.04 (Noble)  → Ubuntu universe packages (dotnet-sdk-8.0 available natively)
-    #   22.04 (Jammy)  → Ubuntu universe packages also work (added in 22.04.2)
-    #   20.04 (Focal)  → Microsoft APT feed
-    #   18.04 (Bionic) → Microsoft APT feed
-    #   other          → dotnet-install.sh binary fallback
-    case "$MAJOR_VER" in
-        24|23)
-            if $SUDO apt-get install -y --dry-run dotnet-sdk-${DOTNET_SDK_VERSION} &>/dev/null 2>&1; then
-                install_dotnet_via_ubuntu_packages
-            else
-                warn "Ubuntu package dotnet-sdk-${DOTNET_SDK_VERSION} not found; trying Microsoft feed."
-                install_dotnet_via_microsoft_repo || install_dotnet_via_binaries
-            fi
-            ;;
-        22)
-            # Try Ubuntu universe first (available since 22.04.2), fall back to MS feed
-            $SUDO apt-get update -qq
-            if apt-cache show dotnet-sdk-${DOTNET_SDK_VERSION} &>/dev/null 2>&1; then
-                install_dotnet_via_ubuntu_packages
-            else
-                install_dotnet_via_microsoft_repo || install_dotnet_via_binaries
-            fi
-            ;;
-        20|18)
-            install_dotnet_via_microsoft_repo || install_dotnet_via_binaries
-            ;;
-        *)
-            warn "Unknown Ubuntu major version ${MAJOR_VER}; using dotnet-install.sh fallback."
-            install_dotnet_via_binaries
-            ;;
-    esac
+    info "Installing .NET 8 SDK..."
+    ${SUDO} apt-get update -qq
 
-    # Verify
-    command -v dotnet &>/dev/null || die "dotnet not on PATH after installation. Check the output above."
-    local ver
-    ver="$(dotnet --version)"
-    success ".NET SDK ${ver} installed."
+    if ${SUDO} apt-get install -y dotnet-sdk-8.0 >/dev/null 2>&1; then
+        success "Installed dotnet-sdk-8.0 from Ubuntu repositories."
+    else
+        warn "dotnet-sdk-8.0 not available in current apt sources. Adding Microsoft feed."
+        local deb="/tmp/packages-microsoft-prod.deb"
+        if command -v curl >/dev/null 2>&1; then
+            curl -fsSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -o "${deb}"
+        elif command -v wget >/dev/null 2>&1; then
+            wget -q "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -O "${deb}"
+        else
+            die "Need curl or wget to download Microsoft package feed setup."
+        fi
+        ${SUDO} dpkg -i "${deb}" >/dev/null
+        rm -f "${deb}"
+        ${SUDO} apt-get update -qq
+        ${SUDO} apt-get install -y dotnet-sdk-8.0
+        success "Installed dotnet-sdk-8.0 from Microsoft feed."
+    fi
+
+    command -v dotnet >/dev/null 2>&1 || die "dotnet command not found after installation."
 }
 
-# ── Step 2: Install runtime dependencies ──────────────────────────────────
 install_runtime_deps() {
     info "Installing runtime dependencies..."
-
-    # Base X11 / GTK libs (Avalonia needs these)
     local pkgs=(
-        libx11-6          # X11 client library (screen capture, hotkeys)
-        libfontconfig1    # Font rendering
-        libice6 libsm6    # X11 session management
-        libxt6            # X Toolkit intrinsics
-        # GTK3 (Avalonia GTK backend)
+        libx11-6
         libgtk-3-0
-        libglib2.0-0
-        libgdk-pixbuf-2.0-0
-        libpango-1.0-0
-        libcairo2
-        # Notifications
-        libnotify-bin     # provides notify-send
-        # Clipboard tools (install both; destination picks whichever is present)
+        libnotify-bin
         xclip
         xsel
     )
 
-    # wl-clipboard for Wayland clipboard support (not available on all versions)
-    if apt-cache show wl-clipboard &>/dev/null 2>&1; then
+    ${SUDO} apt-get update -qq
+    if apt-cache show wl-clipboard >/dev/null 2>&1; then
         pkgs+=(wl-clipboard)
     fi
 
-    $SUDO apt-get install -y "${pkgs[@]}"
+    ${SUDO} apt-get install -y "${pkgs[@]}"
     success "Runtime dependencies installed."
 }
 
-# ── Step 3: Build the application ─────────────────────────────────────────
 build_app() {
-    info "Building Greenshot..."
+    [[ -f "${SRC_DIR}/Greenshot/Greenshot.csproj" ]] || die "Project file not found at ${SRC_DIR}/Greenshot/Greenshot.csproj"
 
-    [[ -f "${SRC_DIR}/Greenshot.sln" ]] || \
-        die "Solution file not found at ${SRC_DIR}/Greenshot.sln. Run this script from the ported/ directory."
+    local arch runtime
+    arch="$(uname -m)"
+    case "${arch}" in
+        x86_64) runtime="linux-x64" ;;
+        aarch64) runtime="linux-arm64" ;;
+        armv7l) runtime="linux-arm" ;;
+        *) die "Unsupported architecture: ${arch}" ;;
+    esac
 
-    rm -rf "$BUILD_DIR"
-    mkdir -p "$BUILD_DIR"
+    info "Building Greenshot (${runtime})..."
+    rm -rf "${OUT_DIR}"
+    mkdir -p "${OUT_DIR}"
 
-    dotnet publish \
-        "${SRC_DIR}/Greenshot/Greenshot.csproj" \
+    dotnet publish "${SRC_DIR}/Greenshot/Greenshot.csproj" \
         --configuration Release \
-        --runtime "linux-${DOTNET_ARCH}" \
+        --runtime "${runtime}" \
         --self-contained true \
-        --output "$BUILD_DIR" \
+        --output "${OUT_DIR}" \
         -p:PublishSingleFile=true \
-        -p:PublishReadyToRun=true \
-        -p:DebugType=none \
-        --verbosity quiet
+        -p:PublishReadyToRun=true
 
-    [[ -f "${BUILD_DIR}/Greenshot" ]] || \
-        die "Build succeeded but output binary not found at ${BUILD_DIR}/Greenshot."
-
-    success "Build complete → ${BUILD_DIR}/Greenshot"
+    [[ -x "${OUT_DIR}/Greenshot" ]] || die "Build did not produce ${OUT_DIR}/Greenshot"
+    success "Build complete: ${OUT_DIR}/Greenshot"
 }
 
-# ── Step 4: Install the binary ────────────────────────────────────────────
-install_app() {
-    info "Installing Greenshot to system..."
+install_files() {
+    [[ -f "${OUT_DIR}/Greenshot" ]] || die "Missing ${OUT_DIR}/Greenshot. Run build or remove --skip-build."
 
-    # Binary
-    $SUDO install -m 755 "${BUILD_DIR}/Greenshot" "${INSTALL_BIN}"
-    success "Binary installed: ${INSTALL_BIN}"
+    info "Installing Greenshot binary to ${INSTALL_BIN}"
+    ${SUDO} mkdir -p "$(dirname "${INSTALL_BIN}")"
+    ${SUDO} install -m 755 "${OUT_DIR}/Greenshot" "${INSTALL_BIN}"
 
-    # Icon (convert the .ico to PNG for Linux desktop integration)
-    $SUDO mkdir -p "$INSTALL_ICON_DIR"
-    local icon_src="${SRC_DIR}/Greenshot/Assets/greenshot.ico"
-    if [[ -f "$icon_src" ]]; then
-        if command -v convert &>/dev/null; then
-            $SUDO convert "${icon_src}[3]" "${INSTALL_ICON_DIR}/greenshot.png" 2>/dev/null || \
-            $SUDO convert "${icon_src}"    "${INSTALL_ICON_DIR}/greenshot.png" 2>/dev/null || true
-        elif command -v ffmpeg &>/dev/null; then
-            $SUDO ffmpeg -i "$icon_src" "${INSTALL_ICON_DIR}/greenshot.png" -y -loglevel quiet 2>/dev/null || true
-        else
-            warn "ImageMagick (convert) not found — skipping PNG icon conversion. Install imagemagick for a proper tray icon."
-            # Copy ICO as-is; Avalonia can load it at runtime
-        fi
-        success "Icon installed: ${INSTALL_ICON_DIR}/greenshot.png"
+    if [[ -f "${SRC_DIR}/Greenshot/Assets/greenshot.ico" ]]; then
+        ${SUDO} install -m 644 "${SRC_DIR}/Greenshot/Assets/greenshot.ico" "${INSTALL_ICON}"
     else
-        warn "Icon source not found at ${icon_src}."
+        warn "Icon not found at ${SRC_DIR}/Greenshot/Assets/greenshot.ico"
     fi
 
-    # .desktop file
-    $SUDO tee "${INSTALL_DESKTOP}" > /dev/null <<DESKTOP
+    info "Installing desktop entry to ${INSTALL_DESKTOP}"
+    ${SUDO} tee "${INSTALL_DESKTOP}" >/dev/null <<EOF
 [Desktop Entry]
 Name=Greenshot
-Comment=Screenshot tool for Linux — capture, annotate, share
+Comment=Screenshot tool for Linux
 Exec=${INSTALL_BIN}
-Icon=greenshot
+Icon=${INSTALL_ICON}
 Type=Application
 Categories=Graphics;Photography;Utility;
 Keywords=screenshot;capture;screen;annotation;
 StartupNotify=false
 X-GNOME-Autostart-enabled=true
-DESKTOP
-    $SUDO chmod 644 "${INSTALL_DESKTOP}"
-    success "Desktop entry installed: ${INSTALL_DESKTOP}"
+EOF
+    ${SUDO} chmod 644 "${INSTALL_DESKTOP}"
 
-    # Autostart entry (GNOME/KDE)
-    local autostart_dir="${HOME}/.config/autostart"
-    mkdir -p "$autostart_dir"
-    cp "${SCRIPT_DIR}/greenshot.desktop" "${autostart_dir}/greenshot.desktop" 2>/dev/null || \
-    tee "${autostart_dir}/greenshot.desktop" > /dev/null <<AUTOSTART
+    if command -v update-desktop-database >/dev/null 2>&1; then
+        ${SUDO} update-desktop-database /usr/share/applications >/dev/null 2>&1 || true
+    fi
+}
+
+install_autostart() {
+    [[ ${NO_AUTOSTART} -eq 0 ]] || {
+        info "Skipping autostart setup (--no-autostart)."
+        return
+    }
+
+    info "Creating autostart entry for user ${TARGET_USER}"
+    local autostart_dir="${TARGET_HOME}/.config/autostart"
+    local autostart_file="${autostart_dir}/greenshot.desktop"
+
+    run_as_target_user mkdir -p "${autostart_dir}"
+    run_as_target_user bash -c "cat > '${autostart_file}' <<'EOF'
 [Desktop Entry]
 Name=Greenshot
+Comment=Screenshot tool for Linux
 Exec=${INSTALL_BIN}
+Icon=${INSTALL_ICON}
 Type=Application
 X-GNOME-Autostart-enabled=true
-AUTOSTART
-    success "Autostart entry installed: ${autostart_dir}/greenshot.desktop"
-
-    # Update icon cache
-    if command -v gtk-update-icon-cache &>/dev/null; then
-        $SUDO gtk-update-icon-cache -f -t /usr/share/icons/hicolor &>/dev/null || true
-    fi
-
-    # Update desktop database
-    if command -v update-desktop-database &>/dev/null; then
-        $SUDO update-desktop-database /usr/share/applications &>/dev/null || true
-    fi
+EOF"
 }
 
-# ── Step 5: Optionally create config directory ─────────────────────────────
-create_config_dir() {
-    local cfg_dir="${HOME}/.config/greenshot"
-    mkdir -p "$cfg_dir"
-    info "Config directory: ${cfg_dir}/greenshot.json"
+create_user_config_dir() {
+    local cfg_dir="${TARGET_HOME}/.config/greenshot"
+    run_as_target_user mkdir -p "${cfg_dir}"
+    success "Config directory ready: ${cfg_dir}"
 }
 
-# ── Main ──────────────────────────────────────────────────────────────────
-echo ""
-echo -e "${CYAN}╔══════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║      Greenshot for Ubuntu — Installer    ║${NC}"
-echo -e "${CYAN}╚══════════════════════════════════════════╝${NC}"
-echo ""
+main() {
+    echo
+    echo -e "${CYAN}Greenshot Linux Installer${NC}"
+    echo
 
-# Parse flags
-SKIP_DEPS=0
-SKIP_DOTNET=0
-SKIP_BUILD=0
-for arg in "$@"; do
-    case "$arg" in
-        --skip-deps)   SKIP_DEPS=1   ;;
-        --skip-dotnet) SKIP_DOTNET=1 ;;
-        --skip-build)  SKIP_BUILD=1  ;;
-        --help|-h)
-            echo "Usage: $0 [--skip-deps] [--skip-dotnet] [--skip-build]"
-            echo ""
-            echo "  --skip-deps    Skip runtime dependency installation (apt packages)"
-            echo "  --skip-dotnet  Skip .NET SDK check/installation"
-            echo "  --skip-build   Skip build step (use existing .build_output/)"
-            exit 0
-            ;;
-        *)
-            die "Unknown option: $arg  (try --help)"
-            ;;
-    esac
-done
+    check_ubuntu
+    [[ ${SKIP_DOTNET} -eq 1 ]] || ensure_dotnet
+    [[ ${SKIP_DEPS} -eq 1 ]] || install_runtime_deps
+    [[ ${SKIP_BUILD} -eq 1 ]] || build_app
+    install_files
+    install_autostart
+    create_user_config_dir
 
-[[ $SKIP_DOTNET -eq 0 ]] && ensure_dotnet
-[[ $SKIP_DEPS   -eq 0 ]] && install_runtime_deps
-[[ $SKIP_BUILD  -eq 0 ]] && build_app
-install_app
-create_config_dir
+    echo
+    success "Installation complete."
+    echo "Run: ${INSTALL_BIN}"
+    echo
+}
 
-echo ""
-echo -e "${GREEN}╔══════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║         Installation complete! ✓         ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "  Run now:    ${CYAN}greenshot${NC}"
-echo -e "  Settings:   ${CYAN}~/.config/greenshot/greenshot.json${NC}"
-echo ""
-echo -e "  Default hotkeys:"
-echo -e "    ${YELLOW}Print${NC}          → Capture region"
-echo -e "    ${YELLOW}Ctrl+Print${NC}     → Capture full screen"
-echo -e "    ${YELLOW}Alt+Print${NC}      → Capture window"
-echo -e "    ${YELLOW}Shift+Print${NC}    → Capture last region"
-echo ""
-echo -e "  ${YELLOW}Note:${NC} Global hotkeys require X11 (or XWayland on Wayland sessions)."
-echo -e "        For pure Wayland, configure shortcuts in GNOME Settings → Keyboard."
-echo ""
+main "$@"

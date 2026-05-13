@@ -16,8 +16,4 @@ if [ -d "$SCRIPT_DIR/publish" ]; then
     echo "Removed publish/"
 fi
 
-# Remove distributable zips
-find "$SCRIPT_DIR" -maxdepth 1 -name "greenshot-linux-x64-*.zip" -exec rm -f {} +
-echo "Removed distributable zips (if any)"
-
 echo "Done. Run ./build.sh to rebuild."
