@@ -25,6 +25,7 @@ OUT_DIR="${SCRIPT_DIR}/.build_output"
 
 INSTALL_PREFIX="/usr/local"
 INSTALL_BIN="${INSTALL_PREFIX}/bin/greenshot"
+INSTALL_APP_DIR="${INSTALL_PREFIX}/lib/greenshot"
 INSTALL_DESKTOP="/usr/share/applications/greenshot.desktop"
 INSTALL_ICON="/usr/share/pixmaps/greenshot.ico"
 
@@ -40,7 +41,7 @@ Usage: ./install.sh [options]
 Options:
   --skip-dotnet      Skip .NET SDK installation/check
   --skip-deps        Skip runtime dependency installation
-  --skip-build       Skip build step and use existing .build_output/Greenshot
+    --skip-build       Skip build step and use existing .build_output/
   --no-autostart     Do not create ~/.config/autostart/greenshot.desktop
   --prefix <path>    Install binary under prefix (default: /usr/local)
   -h, --help         Show help
@@ -69,6 +70,7 @@ while [[ $# -gt 0 ]]; do
             [[ $# -ge 2 ]] || die "--prefix requires a value"
             INSTALL_PREFIX="$2"
             INSTALL_BIN="${INSTALL_PREFIX}/bin/greenshot"
+            INSTALL_APP_DIR="${INSTALL_PREFIX}/lib/greenshot"
             shift 2
             ;;
         -h|--help)
@@ -177,19 +179,31 @@ build_app() {
         --runtime "${runtime}" \
         --self-contained true \
         --output "${OUT_DIR}" \
-        -p:PublishSingleFile=true \
+        -p:PublishSingleFile=false \
         -p:PublishReadyToRun=true
 
     [[ -x "${OUT_DIR}/Greenshot" ]] || die "Build did not produce ${OUT_DIR}/Greenshot"
-    success "Build complete: ${OUT_DIR}/Greenshot"
+    [[ -f "${OUT_DIR}/libSkiaSharp.so" ]] || die "Build output is missing ${OUT_DIR}/libSkiaSharp.so"
+    success "Build complete: ${OUT_DIR}"
 }
 
 install_files() {
     [[ -f "${OUT_DIR}/Greenshot" ]] || die "Missing ${OUT_DIR}/Greenshot. Run build or remove --skip-build."
+    [[ -f "${OUT_DIR}/libSkiaSharp.so" ]] || die "Missing ${OUT_DIR}/libSkiaSharp.so. Re-run without --skip-build."
 
-    info "Installing Greenshot binary to ${INSTALL_BIN}"
+    info "Installing Greenshot files to ${INSTALL_APP_DIR}"
+    ${SUDO} rm -rf "${INSTALL_APP_DIR}"
+    ${SUDO} mkdir -p "${INSTALL_APP_DIR}"
+    ${SUDO} cp -a "${OUT_DIR}/." "${INSTALL_APP_DIR}/"
+
+    info "Installing launcher to ${INSTALL_BIN}"
     ${SUDO} mkdir -p "$(dirname "${INSTALL_BIN}")"
-    ${SUDO} install -m 755 "${OUT_DIR}/Greenshot" "${INSTALL_BIN}"
+    ${SUDO} tee "${INSTALL_BIN}" >/dev/null <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+exec "${INSTALL_APP_DIR}/Greenshot" "\$@"
+EOF
+    ${SUDO} chmod 755 "${INSTALL_BIN}"
 
     if [[ -f "${SRC_DIR}/Greenshot/Assets/greenshot.ico" ]]; then
         ${SUDO} install -m 644 "${SRC_DIR}/Greenshot/Assets/greenshot.ico" "${INSTALL_ICON}"
